@@ -2,13 +2,14 @@
 
 //server URL with port
 //change this and the endpoints accordingly
-const _URL = "localhost:8008";
+const _URL = "http://localhost:3000";
 
 //endpoints for each http request type
-const _createEndpoint="/create";
-const _readEndpoint="/read"
-const _updateEndpoint="/update";
-const _deleteEndpoint="/delete";
+const _endpoint="/fruit";
+const _endpointHi="/hello";
+
+//Button that says hi on an alert
+let _helloBtn;
 
 //DOM elements for GET results
 let _resultTable;
@@ -45,6 +46,7 @@ let _deleteBtn;
 //TODO: way too messy
 //find a more readable way to load DOM elements
 function DOM_loadElements(){
+	_helloBtn = document.getElementById("helloBtn");
 	_createLog = document.getElementById("createLog");
 	_resultTable = document.getElementById("readResultsLog");
 	_updateLog = document.getElementById("updateLog");
@@ -69,8 +71,8 @@ function DOM_loadElements(){
 
 //Fruit data type helper
 class Fruit{
-	construct(ID, NAME, COLOR){
-		this.id = ID;
+	constructor(ID, NAME, COLOR){
+		this._id = ID;
 		this.name = NAME;
 		this.color = COLOR;
 	}
@@ -80,14 +82,15 @@ class Fruit{
 function sendRequest(DATA, URL, ENDPOINT, METHOD) {
 	return fetch(URL+ENDPOINT, {
 	    method: METHOD,
-	    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+	    headers: {'Content-Type':'application/json'},
 	    body: JSON.stringify(DATA)
 	});
 }
 
 //safe than editing inner html
 //doesn't allow injection
-function DOM_addText(element, text){
+function DOM_setText(element, text){
+	element.innerHTML='';
 	const txt = document.createTextNode(text);
 	element.appendChild(txt);
 }
@@ -95,15 +98,20 @@ function DOM_addText(element, text){
 //gets promise from sendRequest and validates it
 //valid responses to Create,Update and Delete are logged
 function logResponseString(resp, LogFromDOM){
-	resp.then((response) => {
+	resp
+	.then(function (response) {
 		if(response.ok){
-			DOM_addText(LogFromDOM, resp.data);
+			return response.text();
 		}
 		else{
-			DOM_addText(LogFromDOM, (new Error(`HTTP error! Status: ${response.status}`)).toString());
+			return (new Error(`HTTP error! Status: ${response.status}`)).toString();
 		}
-	}).catch((error) =>{
-		DOM_addText(LogFromDOM, error.toString());
+	})
+	.then(function (data){
+		DOM_setText(LogFromDOM, data);
+	})
+	.catch((error) =>{
+		DOM_setText(LogFromDOM, error.toString());
 	});
 }
 
@@ -112,8 +120,9 @@ function logResponseString(resp, LogFromDOM){
 //TODO: melhorar com o TODO interno
 function createTable(resp, LogFromDOM) {
 	resp.then((response) => {
+		console.log(response.toString());
 		if(!response.ok){
-			DOM_addText(LogFromDOM, (new Error(`HTTP error! Status: ${response.status}`)).toString());
+			DOM_setText(LogFromDOM, (new Error(`HTTP error! Status: ${response.status}`)).toString());
 		}
 		else{
 			//TODO: fazer 2 funcs
@@ -123,33 +132,33 @@ function createTable(resp, LogFromDOM) {
 			const DOM_headerRow = document.createElement("tr");
 			
 			const DOM_header1 = document.createElement("th");
-			DOM_addText(DOM_header1, "id");
+			DOM_setText(DOM_header1, "id");
 			DOM_headerRow.appendChild(DOM_header1);
 			
 			const DOM_header2 = document.createElement("th");
-			DOM_addText(DOM_header1, "name");
+			DOM_setText(DOM_header1, "name");
 			DOM_headerRow.appendChild(DOM_header2);
 			
 			const DOM_header3 = document.createElement("th");
-			DOM_addText(DOM_header1, "color");
+			DOM_setText(DOM_header1, "color");
 			DOM_headerRow.appendChild(DOM_header3);
 			
-			LogFromDOM.appendChild(DOM_header);
+			LogFromDOM.appendChild(DOM_headerRow);
 
 			console.log(response.body);
 			for(const fruit of response.body){
 				const DOM_row = document.createElement("tr");
 
 				const DOM_FruitId = document.createElement("td")
-				DOM_addText(fruit.id);
+				DOM_setText(fruit.id);
 				DOM_row.appendChild(DOM_FruitId);
 
 				const DOM_FruitName = document.createElement("td")
-				DOM_addText(fruit.name);
+				DOM_setText(fruit.name);
 				DOM_row.appendChild(DOM_FruitName);
 
 				const DOM_FruitColor = document.createElement("td")
-				DOM_addText(fruit.color);
+				DOM_setText(fruit.color);
 				DOM_row.appendChild(DOM_FruitColor);
 
 				LogFromDOM.appendChild(DOM_row);
@@ -157,7 +166,7 @@ function createTable(resp, LogFromDOM) {
 
 		}
 	}).catch((error) =>{
-		DOM_addText(LogFromDOM, error.toString());
+		DOM_setText(LogFromDOM, error.toString());
 	});
 }
 
@@ -196,7 +205,7 @@ function create(){
 	console.log("creating");
 	const fruit = new Fruit(_createId.value, _createName.value, _createColor.value);
 	logResponseString(
-		sendRequest(fruit, _URL, _createEndpoint, "POST"),
+		sendRequest(fruit, _URL, _endpoint, "POST"),
 		_createLog
 	);
 }
@@ -210,7 +219,7 @@ function read() {
 	deleteTable(_resultTable);
 	_resultTable.innerHTML="";
 	createTable(
-		fetch(_URL+_readEndpoint+getParams),
+		fetch(_URL+_endpoint+getParams),
 		_resultTable
 	);
 }
@@ -223,7 +232,7 @@ function update(){
 	console.log("updating");
 	const fruit = new Fruit(_updateId.value, _updateName.value, _updateColor.value);
 	logResponseString(
-		sendRequest(fruit, _URL, _updateEndpoint, "PATCH"),
+		sendRequest(fruit, _URL, _endpoint, "PATCH"),
 		_updateLog
 	);
 }
@@ -235,13 +244,24 @@ function Delete(){
 	console.log("deleting");
 	const fruit = new Fruit(_deleteId.value, _deleteName.value, _deleteColor.value);
 	logResponseString(
-		sendRequest(fruit, _URL, _deleteEndpoint, "DELETE"),
+		sendRequest(fruit, _URL, _endpoint, "DELETE"),
 		_deleteLog
 	);
 }
 
+function hello(){
+	console.log(_URL+_endpointHi);
+	fetch(_URL+_endpointHi)
+	.then(response => response.text())
+	.then((data) => alert(data))
+	.catch((error) =>{
+		alert(error.toString());
+	});
+}
+
 window.onload = function main() {
 	DOM_loadElements();
+	_helloBtn.addEventListener("click", hello);
 	_createBtn.addEventListener("click", create);
 	_readBtn.addEventListener("click", read);
 	_updateBtn.addEventListener("click", update);
