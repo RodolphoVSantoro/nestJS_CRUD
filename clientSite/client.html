@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="client.js"></script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Fruit CRUD</title>
+</head>
+<body>
+	<label for="createForm">Create a fruit<br>(must have all fields complete. must have unique id)<br>
+	<div name="createForm" id="createForm">
+		<label for="createId">ID:
+		<input type="text" name="createId" id="createId">
+		<label for="createName">Fruit name: 
+		<input type="text" name="createName" id="createName">
+		<label for="createColor">Fruit color:
+		<input type="text" name="createColor" id="createColor">
+		<button name="createBtn" id="createBtn" >insert</button>
+	</div><br>
+	<div id="createLog"></div><br><br>
+	
+	<label for="readForm">read using the filters bellow<br>(has to be valid id. empty fields won't be filtered)<br>
+	<div name ="readForm" id ="readForm">
+		<label for="readId">ID:
+		<input type="text" name="readId" id="readId">
+		<label for="readName">Fruit name: 
+		<input type="text" name="readName" id="readName">
+		<label for="readColor">Fruit color:
+		<input type="text" name="readColor" id="readColor">
+		<button name="readBtn" id="readBtn">read</button>
+	</div><br>
+	<table id="readResultsLog"></table><br><br>
+
+	<label for="updateForm">Update with the other fields, filtered by id<br>(has to be valid id. empty fields won't change)<br>
+	<div name = "updateForm" id = "updateForm">
+		<label for="updateID">ID:
+		<input type="text" name="updateId" id="updateId">
+		<label for="updateName">Fruit name: 
+		<input type="text" name="updateName" id="updateName">
+		<label for="createColor">Fruit color:
+		<input type="text" name="updateColor" id="updateColor">
+		<button name="updateBtn" id="updateBtn">update</button>
+	</div><br>
+	<div id="updateLog"></div><br><br>
+	
+	<label for="deleteForm">Delete everything matching those filters<br>(if left empty, will delete everything)<br>
+	<div name = "deleteForm" id = "deleteForm" method="DELETE" action="localhost:8008/delete">
+		<label for="deleteId">ID:
+		<input type="text" name="deleteId" id="deleteId">
+		<label for="deleteName">Fruit name: 
+		<input type="text" name="deleteName" id="deleteName">
+		<label for="deleteColor">Fruit color:
+		<input type="text" name="deleteColor" id="deleteColor">
+		<button name="deleteBtn" id="deleteBtn">delete</button>
+	</div><br>
+	<div id="deleteLog"></div>
+</body>
+</html>
