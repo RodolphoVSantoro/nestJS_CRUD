@@ -87,7 +87,7 @@ function sendRequest(DATA, URL, ENDPOINT, METHOD) {
 	});
 }
 
-//safe than editing inner html
+//safer than editing inner html
 //doesn't allow injection
 function DOM_setText(element, text){
 	element.innerHTML='';
@@ -119,51 +119,51 @@ function logResponseString(resp, LogFromDOM){
 //log in this case is an already existing table
 //TODO: melhorar com o TODO interno
 function createTable(resp, LogFromDOM) {
-	resp.then((response) => {
-		console.log(response.toString());
+	resp.then((response)=>{
 		if(!response.ok){
 			DOM_setText(LogFromDOM, (new Error(`HTTP error! Status: ${response.status}`)).toString());
 		}
 		else{
-			//TODO: fazer 2 funcs
-			//ambas com num de args variável
-			//uma cria linha de header
-			//outra cria linha de conteúdo
-			const DOM_headerRow = document.createElement("tr");
-			
-			const DOM_header1 = document.createElement("th");
-			DOM_setText(DOM_header1, "id");
-			DOM_headerRow.appendChild(DOM_header1);
-			
-			const DOM_header2 = document.createElement("th");
-			DOM_setText(DOM_header1, "name");
-			DOM_headerRow.appendChild(DOM_header2);
-			
-			const DOM_header3 = document.createElement("th");
-			DOM_setText(DOM_header1, "color");
-			DOM_headerRow.appendChild(DOM_header3);
-			
-			LogFromDOM.appendChild(DOM_headerRow);
+			return response.json();
+		}
+	})
+	.then((data) => {
+		//TODO: fazer 2 funcs
+		//ambas com num de args variável
+		//uma cria linha de header
+		//outra cria linha de conteúdo
+		const DOM_headerRow = document.createElement("tr");
+		
+		const DOM_header1 = document.createElement("th");
+		DOM_setText(DOM_header1, "id");
+		DOM_headerRow.appendChild(DOM_header1);
+		
+		const DOM_header2 = document.createElement("th");
+		DOM_setText(DOM_header2, "name");
+		DOM_headerRow.appendChild(DOM_header2);
+		
+		const DOM_header3 = document.createElement("th");
+		DOM_setText(DOM_header3, "color");
+		DOM_headerRow.appendChild(DOM_header3);
+		
+		LogFromDOM.appendChild(DOM_headerRow);
 
-			console.log(response.body);
-			for(const fruit of response.body){
-				const DOM_row = document.createElement("tr");
+		for(const fruit of data){
+			const DOM_row = document.createElement("tr");
 
-				const DOM_FruitId = document.createElement("td")
-				DOM_setText(fruit.id);
-				DOM_row.appendChild(DOM_FruitId);
+			const DOM_FruitId = document.createElement("td")
+			DOM_setText(DOM_FruitId, fruit._id);
+			DOM_row.appendChild(DOM_FruitId);
 
-				const DOM_FruitName = document.createElement("td")
-				DOM_setText(fruit.name);
-				DOM_row.appendChild(DOM_FruitName);
+			const DOM_FruitName = document.createElement("td")
+			DOM_setText(DOM_FruitName, fruit.name);
+			DOM_row.appendChild(DOM_FruitName);
 
-				const DOM_FruitColor = document.createElement("td")
-				DOM_setText(fruit.color);
-				DOM_row.appendChild(DOM_FruitColor);
+			const DOM_FruitColor = document.createElement("td")
+			DOM_setText(DOM_FruitColor, fruit.color);
+			DOM_row.appendChild(DOM_FruitColor);
 
-				LogFromDOM.appendChild(DOM_row);
-			}
-
+			LogFromDOM.appendChild(DOM_row);
 		}
 	}).catch((error) =>{
 		DOM_setText(LogFromDOM, error.toString());
@@ -187,11 +187,11 @@ function deleteTable(table){
 
 function getArgsFromObject(obj){
 	let args = "";
-	let connector="/";
+	let connector="?";
 	let keys = Object.keys(obj);
 	let values = Object.values(obj);
 	for(let i=0;i<values.length;i++){
-		if(!(values[i].length)){
+		if(values[i].length){
 			args = args + connector + keys[i] + "=" + values[i];
 			connector = "&";
 		}
@@ -215,7 +215,9 @@ function create(){
 function read() {
 	console.log("reading");
 	const fruit = new Fruit(_readId.value, _readName.value, _readColor.value);
+	console.log(fruit);
 	const getParams = getArgsFromObject(fruit);
+	console.log(_URL+_endpoint+getParams);
 	deleteTable(_resultTable);
 	_resultTable.innerHTML="";
 	createTable(
