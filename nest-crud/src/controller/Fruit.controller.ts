@@ -5,8 +5,8 @@ import {
   Get,
   Param,
   Patch,
-  Post,
-} from '@nestjs/common';
+  Post, Query
+} from "@nestjs/common";
 import { FruitService } from '../service/Fruit.service';
 import { FruitDTO } from '../DTO/FruitDTO';
 
@@ -15,26 +15,26 @@ export class FruitController {
   constructor(private readonly fruitService: FruitService) {}
 
   @Get()
-  read(
-    @Param('id') id: string,
-    @Param('name') name: string,
-    @Param('color') color: string,
-  ): FruitDTO[] {
-    return this.fruitService.getFruits({ _id: id, name: name, color: color });
+  async read(
+    @Query('_id') _id: string,
+    @Query('name') name: string,
+    @Query('color') color: string,
+  ): Promise<FruitDTO[]> {
+    return await this.fruitService.getFruits(_id, name, color);
   }
 
   @Post()
-  create(@Body() fruit: FruitDTO): string {
-    return this.fruitService.createFruit(fruit);
+  async create(@Body() fruit: FruitDTO): Promise<string> {
+    return await this.fruitService.createFruit(fruit);
   }
 
   @Patch()
-  update(@Body() fruitFilter: string): string {
-    return this.fruitService.updateFruits(fruitFilter);
+  async update(@Body() fruitFilter: FruitDTO): Promise<string> {
+    return await this.fruitService.updateFruits(fruitFilter);
   }
 
   @Delete()
-  delete(@Body() fruitFilter: string): string {
-    return this.fruitService.deleteFruits(fruitFilter);
+  async delete(@Body() fruitFilter: FruitDTO): Promise<string> {
+    return await this.fruitService.deleteFruits(fruitFilter);
   }
 }
