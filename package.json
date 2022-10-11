@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@nestjs/common": "^9.1.4",
+    "@nestjs/mongoose": "^9.2.0",
+    "eslit": "^6.0.0",
+    "firebase-functions": "^3.24.1",
+    "lodash": "^4.17.21",
+    "mongoose": "^6.6.5"
+  }
+}

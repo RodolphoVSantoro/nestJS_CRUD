@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Patch,
   Post, Query
 } from "@nestjs/common";
@@ -13,7 +12,6 @@ import { FruitDTO } from '../DTO/FruitDTO';
 @Controller('fruit')
 export class FruitController {
   constructor(private readonly fruitService: FruitService) {}
-
   @Get()
   async read(
     @Query('_id') _id: string,
@@ -24,8 +22,8 @@ export class FruitController {
   }
 
   @Post()
-  async create(@Body() fruit: FruitDTO): Promise<string> {
-    return await this.fruitService.createFruit(fruit);
+  async create(@Body() fruits: FruitDTO[]): Promise<string> {
+    return await this.fruitService.createFruit(fruits);
   }
 
   @Patch()

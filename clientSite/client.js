@@ -23,6 +23,12 @@ let _deleteLog;
 let _createId;
 let _createName;
 let _createColor;
+let _createId2;
+let _createName2;
+let _createColor2;
+let _createId3;
+let _createName3;
+let _createColor3;
 let _createBtn;
 
 //textInputs and button for reading
@@ -54,6 +60,12 @@ function DOM_loadElements(){
 	_createId = document.getElementById("createId");
 	_createName = document.getElementById("createName");
 	_createColor = document.getElementById("createColor");
+	_createId2 = document.getElementById("createId2");
+	_createName2 = document.getElementById("createName2");
+	_createColor2 = document.getElementById("createColor2");
+	_createId3 = document.getElementById("createId3");
+	_createName3 = document.getElementById("createName3");
+	_createColor3 = document.getElementById("createColor3");
 	_createBtn = document.getElementById("createBtn");
 	_readId = document.getElementById("readId");
 	_readName = document.getElementById("readName");
@@ -203,9 +215,13 @@ function getArgsFromObject(obj){
 //logs success or failure on a DOM object
 function create(){
 	console.log("creating");
-	const fruit = new Fruit(_createId.value, _createName.value, _createColor.value);
+	const fruits = [
+		new Fruit(_createId.value, _createName.value, _createColor.value),
+		new Fruit(_createId2.value, _createName2.value, _createColor2.value),
+		new Fruit(_createId3.value, _createName3.value, _createColor3.value)
+	];
 	logResponseString(
-		sendRequest(fruit, _URL, _endpoint, "POST"),
+		sendRequest(fruits, _URL, _endpoint, "POST"),
 		_createLog
 	);
 }

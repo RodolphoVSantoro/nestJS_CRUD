@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { FruitDTO } from '../DTO/FruitDTO';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { validateFruit } from '../helpers/validators';
 import { Fruit, FruitDocument } from '../schema/Fruit.schema';
+import _ from "lodash";
 
 //TODO: fazer tratamento de erro do mongo
 @Injectable()
@@ -15,70 +17,69 @@ export class FruitService {
     name: string,
     color: string,
   ): Promise<FruitDTO[]> {
-    //TODO: melhorar código da geração desse objeto de filtro
-    // fazer em todas que usam fitro
-    const entries: string[][] = [];
-    if (_id !== undefined) {
-      entries.push(['_id', _id]);
+    let fruit: Partial<FruitDTO> = {};
+    if (_id) {
+      fruit._id = _id;
     }
-    if (name !== undefined) {
-      entries.push(['name', name]);
+    if (name) {
+      fruit.name = name;
     }
-    if (color !== undefined) {
-      entries.push(['color', color]);
+    if (color) {
+      fruit.color = color;
     }
-    if (entries.length > 0) {
-      const fruit = Object.fromEntries(entries);
+    if (!_.isEmpty(fruit)) {
       return await this.fruitModel.find(fruit).exec();
     } else {
       return await this.fruitModel.find().exec();
     }
   }
 
-  async createFruit(fruit: FruitDTO): Promise<string> {
-    if (fruit._id && fruit.name && fruit.color) {
-      if (
-        fruit._id.length > 0 &&
-        fruit.name.length > 0 &&
-        fruit.color.length > 0
-      ) {
-        await new this.fruitModel(fruit).save();
-        //TODO: add error handling
-        return 'success: ' + JSON.stringify(fruit);
+  async createFruit(fruits: FruitDTO[]): Promise<string> {
+    let msg = '';
+    for (const fruit of fruits) {
+      if (validateFruit(fruit)) {
+          await new this.fruitModel(fruit).save();
+          msg += JSON.stringify(fruit) + ' ';
       }
     }
-    return 'failure. must fill all fields';
+    if (msg.length > 0) {
+      return 'created: ' + msg;
+    } else {
+      return 'none created';
+    }
   }
+
   async updateFruits(fruitFilter: FruitDTO): Promise<string> {
-    const keys: string[][] = [];
+    let fruit: Partial<FruitDTO> = {};
     if (fruitFilter.name !== '') {
-      keys.push(['name', fruitFilter.name]);
+      fruit.name = fruitFilter.name;
     }
     if (fruitFilter.color !== '') {
-      keys.push(['color', fruitFilter.color]);
+      fruit.color = fruitFilter.color;
     }
-    if (keys.length > 0) {
+    if (!_.isEmpty(fruit)) {
       await this.fruitModel
-        .findOneAndUpdate({ _id: fruitFilter._id }, Object.fromEntries(keys))
+        .findOneAndUpdate({ _id: fruitFilter._id }, fruit)
         .exec();
       return 'success';
     } else {
       return 'error: fill at least one field other than id';
     }
   }
+
   async deleteFruits(fruitFilter: FruitDTO): Promise<string> {
-    const keys: string[][] = [];
-    if (fruitFilter._id !== '') {
-      keys.push(['_id', fruitFilter._id]);
+    const fruit: Partial<FruitDTO> = {};
+    if (fruitFilter._id) {
+      fruit._id = fruitFilter._id;
     }
-    if (fruitFilter.name !== '') {
-      keys.push(['name', fruitFilter.name]);
+    if (fruitFilter.name) {
+      fruit.name = fruitFilter.name;
     }
-    if (fruitFilter.color !== '') {
-      keys.push(['color', fruitFilter.color]);
+    if (fruitFilter.color) {
+      fruit.color = fruitFilter.color;
     }
-    if (keys.length > 0) {
-      const n = await this.fruitModel.deleteMany(Object.fromEntries(keys));
+    if (!_.isEmpty(fruit)) {
+      const n = await this.fruitModel.deleteMany(fruit).exec();
       return n.deletedCount.toString() + ' deleted';
     } else {
       return 'none deleted';
