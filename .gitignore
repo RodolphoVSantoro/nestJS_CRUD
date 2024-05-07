@@ -1,3 +1,6 @@
 node_modules
 yarn.lock
 yarn-error.log
+nest-crud/node_modules
+nest-crud/yarn.lock
+nest-crud/dist
